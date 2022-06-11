@@ -6,23 +6,43 @@ import { ProductList } from "../../components/products";
 
 import { dbProducts } from "../../database";
 import { IProduct } from "../../interfaces";
+import { getAllProducts } from "../../database/dbProducts";
 
 interface Props {
   products: IProduct[];
+  foundProducts: boolean;
+  query: string;
 }
 
-const SearchPage: NextPage<Props> = ({ products }) => {
+const SearchPage: NextPage<Props> = ({ products, foundProducts, query }) => {
   return (
     <ShopLayout
       title={"Teslo-Shop - Search"}
       pageDescription={"Encuentra los mejores productos de Teslo aquí"}
     >
       <Typography variant="h1" component="h1">
-        Buscar producto
+        Buscar productos
       </Typography>
-      <Typography variant="h2" sx={{ mb: 1 }}>
-        Search:
-      </Typography>
+
+      {foundProducts ? (
+        <Typography variant="h2" sx={{ mb: 1 }} textTransform="capitalize">
+          Término: {query}
+        </Typography>
+      ) : (
+        <>
+          <Typography variant="h2" sx={{ mb: 1 }}>
+            No encontramos ningún producto
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{ ml: 1 }}
+            color="secondary"
+            textTransform="capitalize"
+          >
+            {query}
+          </Typography>
+        </>
+      )}
 
       <ProductList products={products} />
     </ShopLayout>
@@ -45,12 +65,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
   // y no hay productos
   let products = await dbProducts.getProductsByTerm(query);
+  const foundProducts = products.length > 0;
 
   // TODO: retornar otros produtos
+  if (!foundProducts) {
+    // products = await dbProducts.getAllProducts(); // Obtener todos los productos
+    products = await dbProducts.getProductsByTerm("cybertruck");
+  }
 
   return {
     props: {
       products,
+      foundProducts,
+      query,
     },
   };
 };
