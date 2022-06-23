@@ -35,10 +35,6 @@ export const CartProvider: FCC = ({ children }) => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   Cookie.set("cart", JSON.stringify(state.cart));
-  // }, [state.cart]);
-
   useEffect(() => {
     if (isCartReloading.current) {
       isCartReloading.current = false;
@@ -47,11 +43,28 @@ export const CartProvider: FCC = ({ children }) => {
     }
   }, [state.cart]);
 
-  const addProductToCart = (product: ICartProduct) => {
-    // Nivel 1
-    // dispatch({ type: "[Cart] - Add Product", payload: product });
+  useEffect(() => {
+    const numberOfItems = state.cart.reduce(
+      (prev, current) => current.quantity + prev,
+      0
+    );
+    const subTotal = state.cart.reduce(
+      (prev, current) => current.price * current.quantity + prev,
+      0
+    );
+    const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
 
-    // Nivel Final
+    const orderSummary = {
+      numberOfItems,
+      subTotal,
+      tax: subTotal * taxRate,
+      total: subTotal * (taxRate + 1),
+    };
+
+    console.log({ orderSummary });
+  }, [state.cart]);
+
+  const addProductToCart = (product: ICartProduct) => {
     const productInCart = state.cart.some((p) => p._id === product._id);
     if (!productInCart)
       return dispatch({
@@ -84,6 +97,14 @@ export const CartProvider: FCC = ({ children }) => {
     });
   };
 
+  const updateCartQuantity = (product: ICartProduct) => {
+    dispatch({ type: "[Cart] - Change cart quantity", payload: product });
+  };
+
+  const removeCartProduct = (product: ICartProduct) => {
+    dispatch({ type: "[Cart] - Remove product in cart", payload: product });
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -91,6 +112,8 @@ export const CartProvider: FCC = ({ children }) => {
 
         // Methods
         addProductToCart,
+        updateCartQuantity,
+        removeCartProduct,
       }}
     >
       {children}
