@@ -23,8 +23,6 @@ const WomenPage: NextPage = () => {
         Productos para ellas
       </Typography>
 
-      <FullScreenLoading />
-
       {isLoading ? <FullScreenLoading /> : <ProductList products={products} />}
     </ShopLayout>
   );

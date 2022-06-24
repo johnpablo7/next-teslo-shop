@@ -23,8 +23,6 @@ const HomePage: NextPage = () => {
         Todos los productos
       </Typography>
 
-      <FullScreenLoading />
-
       {isLoading ? <FullScreenLoading /> : <ProductList products={products} />}
     </ShopLayout>
   );

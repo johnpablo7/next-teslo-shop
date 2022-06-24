@@ -23,8 +23,6 @@ const MenPage: NextPage = () => {
         Productos para ellos
       </Typography>
 
-      <FullScreenLoading />
-
       {isLoading ? <FullScreenLoading /> : <ProductList products={products} />}
     </ShopLayout>
   );

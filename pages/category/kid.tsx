@@ -23,8 +23,6 @@ const KidPage: NextPage = () => {
         Productos para niños
       </Typography>
 
-      <FullScreenLoading />
-
       {isLoading ? <FullScreenLoading /> : <ProductList products={products} />}
     </ShopLayout>
   );
