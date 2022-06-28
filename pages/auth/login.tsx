@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context";
 import { AuthLayout } from "../../components/layouts";
 import { validations } from "../../utils";
-import { tesloApi } from "../../api";
 import { useRouter } from "next/router";
 
 type FormData = {
@@ -26,7 +25,6 @@ type FormData = {
 const LoginPage = () => {
   const router = useRouter();
   const { loginUser } = useContext(AuthContext);
-
   const {
     register,
     handleSubmit,
@@ -38,9 +36,7 @@ const LoginPage = () => {
   const onLoginUser = async ({ email, password }: FormData) => {
     // console.log({ data });
     setShowError(false);
-
     const isValidLogin = await loginUser(email, password);
-
     if (!isValidLogin) {
       setShowError(true);
       setTimeout(() => setShowError(false), 3000);
@@ -48,7 +44,8 @@ const LoginPage = () => {
     }
 
     // Todo: navegar a la pantalla, que el usuario estaba
-    router.replace("/");
+    const destination = router.query.p?.toString() || "/";
+    router.replace(destination);
   };
 
   return (
@@ -112,7 +109,14 @@ const LoginPage = () => {
             </Grid>
 
             <Grid item xs={12} display="flex" justifyContent="end">
-              <NextLink href="/auth/register" passHref>
+              <NextLink
+                href={
+                  router.query.p
+                    ? `/auth/register?p=${router.query.p}`
+                    : "/auth/register"
+                }
+                passHref
+              >
                 <Link underline="always">¿No tienes Cuenta?</Link>
               </NextLink>
             </Grid>

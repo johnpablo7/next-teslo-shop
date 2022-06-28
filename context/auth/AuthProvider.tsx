@@ -1,8 +1,12 @@
 import { FCC } from "../../types/fc";
 import { useEffect, useReducer } from "react";
-import { AuthContext, authReducer } from "./";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+
 import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
+
+import { AuthContext, authReducer } from "./";
 
 import { tesloApi } from "../../api";
 import { IUser } from "../../interfaces";
@@ -19,12 +23,26 @@ const AUTH_INITIAL_STATE: AuthState = {
 
 export const AuthProvider: FCC = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
+  const { data, status } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    checkToken();
-  }, []);
+    if (status === "authenticated") {
+      console.log({ user: data?.user });
+
+      // TODO: dispatch({type: '[Auth] - Login', payload: data?.user as IUser})
+    }
+  }, [status, data]);
+
+  // useEffect(() => {
+  //   checkToken();
+  // }, []);
 
   const checkToken = async () => {
+    if (!Cookies.get("token")) {
+      return;
+    }
+
     try {
       const { data } = await tesloApi.get("/user/validate-token");
       const { token, user } = data;
@@ -83,6 +101,20 @@ export const AuthProvider: FCC = ({ children }) => {
     }
   };
 
+  const logout = () => {
+    Cookies.remove("token");
+    Cookies.remove("cart");
+    Cookies.remove("firstName");
+    Cookies.remove("lastName");
+    Cookies.remove("address");
+    Cookies.remove("address2");
+    Cookies.remove("zip");
+    Cookies.remove("city");
+    Cookies.remove("country");
+    Cookies.remove("phone");
+    router.reload();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -91,6 +123,7 @@ export const AuthProvider: FCC = ({ children }) => {
         // Methods
         loginUser,
         registerUser,
+        logout,
       }}
     >
       {children}
