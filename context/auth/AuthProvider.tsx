@@ -1,7 +1,7 @@
 import { FCC } from "../../types/fc";
 import { useEffect, useReducer } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
@@ -28,9 +28,8 @@ export const AuthProvider: FCC = ({ children }) => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      console.log({ user: data?.user });
-
-      // TODO: dispatch({type: '[Auth] - Login', payload: data?.user as IUser})
+      // console.log({ user: data?.user });
+      dispatch({ type: "[Auth] - Login", payload: data?.user as IUser });
     }
   }, [status, data]);
 
@@ -102,7 +101,6 @@ export const AuthProvider: FCC = ({ children }) => {
   };
 
   const logout = () => {
-    Cookies.remove("token");
     Cookies.remove("cart");
     Cookies.remove("firstName");
     Cookies.remove("lastName");
@@ -112,7 +110,10 @@ export const AuthProvider: FCC = ({ children }) => {
     Cookies.remove("city");
     Cookies.remove("country");
     Cookies.remove("phone");
-    router.reload();
+
+    signOut();
+    // router.reload();
+    // Cookies.remove("token");
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Box,
@@ -35,7 +35,7 @@ const getAddressFromCookies = (): FormData => {
     address2: Cookies.get("address2") || "",
     zip: Cookies.get("zip") || "",
     city: Cookies.get("city") || "",
-    country: Cookies.get("country") || "",
+    country: Cookies.get("country") || countries[12].code,
     phone: Cookies.get("phone") || "",
   };
 };
@@ -44,13 +44,31 @@ const AddressPage = () => {
   const router = useRouter();
   const { updateAddress } = useContext(CartContext);
 
+  const [defaultCountry, setDefaultCountry] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormData>({
-    defaultValues: getAddressFromCookies(),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      address: "",
+      address2: "",
+      zip: "",
+      city: "",
+      country: countries[12].code,
+      phone: "",
+    },
   });
+
+  useEffect(() => {
+    const addressFromCookies = getAddressFromCookies();
+    reset(addressFromCookies);
+    setDefaultCountry(addressFromCookies.country);
+  }, [reset]);
 
   const onSubmitAddress = (data: FormData) => {
     // console.log(data);
@@ -119,12 +137,8 @@ const AddressPage = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField label="Código Postal" variant="filled" fullWidth />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
             <TextField
-              label="Ciudad"
+              label="Código Postal"
               variant="filled"
               fullWidth
               {...register("zip", {
@@ -136,25 +150,40 @@ const AddressPage = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
+            <TextField
+              label="Ciudad"
+              variant="filled"
+              fullWidth
+              {...register("city", {
+                required: "Este campo es requerido",
+              })}
+              error={!!errors.city}
+              helperText={errors.city?.message}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
-              <TextField
-                // key={Cookies.get("country") || countries[0].code}
-                select
-                variant="filled"
-                label="País"
-                defaultValue={Cookies.get("country") || countries[0].code}
-                {...register("country", {
-                  required: "Este campo es requerido",
-                })}
-                error={!!errors.country}
-                // helperText={errors.country?.message}
-              >
-                {countries.map((country) => (
-                  <MenuItem key={country.code} value={country.code}>
-                    {country.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              {!!defaultCountry && (
+                <TextField
+                  select
+                  variant="filled"
+                  label="País"
+                  fullWidth
+                  defaultValue={defaultCountry}
+                  {...register("country", {
+                    required: "Este campo es requerido",
+                  })}
+                  error={!!errors.country}
+                  helperText={errors.country?.message}
+                >
+                  {countries.map((country) => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
             </FormControl>
           </Grid>
 
