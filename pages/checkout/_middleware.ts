@@ -4,12 +4,13 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest | any, ev: NextFetchEvent) {
   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  // console.log({ session });
-  const { origin } = req.nextUrl;
 
   if (!session) {
+    const url = req.nextUrl.clone() as URL;
     const requestedPage = req.page.name;
-    return NextResponse.redirect(`${origin}/auth/login?p=${requestedPage}`);
+    url.pathname = `/auth/login`;
+    url.searchParams.append("p", requestedPage);
+    return NextResponse.rewrite(url);
   }
 
   return NextResponse.next();
