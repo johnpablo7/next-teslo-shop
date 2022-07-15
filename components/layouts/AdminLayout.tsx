@@ -33,8 +33,7 @@ export const AdminLayout: FCC<Props> = ({
       >
         <Box display="flex" flexDirection="column">
           <Typography variant="h1" component="h1">
-            {icon}
-            {title}
+            {icon} {title}
           </Typography>
 
           <Typography variant="h2" sx={{ mb: 1 }}>
