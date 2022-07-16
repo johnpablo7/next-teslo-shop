@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { ErrorOutline } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 // import { AuthContext } from "../../context";
 import { AuthLayout } from "../../components/layouts";
@@ -34,6 +34,7 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormData>();
   // console.log({ errors });
   const [showError, setShowError] = useState(false);
@@ -83,32 +84,48 @@ const LoginPage = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Correo"
-                type="email"
-                variant="filled"
-                fullWidth
-                {...register("email", {
+              <Controller
+                name="email"
+                rules={{
                   required: "Este campo es requerido",
                   validate: validations.isEmail,
-                })}
-                error={!!errors.email}
-                helperText={errors.email?.message}
+                }}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Correo"
+                    type="email"
+                    variant="filled"
+                    fullWidth
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Contraseña"
-                type="password"
-                variant="filled"
-                fullWidth
-                {...register("password", {
+              <Controller
+                name="password"
+                rules={{
                   required: "Este campo es requerido",
                   minLength: { value: 6, message: "Mínimo 6 caracteres" },
-                })}
-                error={!!errors.password}
-                helperText={errors.password?.message}
+                }}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Contraseña"
+                    type="password"
+                    variant="filled"
+                    fullWidth
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                )}
               />
             </Grid>
 

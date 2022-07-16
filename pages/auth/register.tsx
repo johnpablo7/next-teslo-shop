@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { signIn, getSession } from "next-auth/react";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   Box,
   Button,
@@ -36,6 +36,7 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormData>();
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -77,47 +78,71 @@ const RegisterPage = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Nombre completo"
-                type="name"
-                variant="filled"
-                fullWidth
-                {...register("name", {
+              <Controller
+                name="name"
+                rules={{
                   required: "Este campo es requerido",
                   minLength: { value: 2, message: "Mínimo 2 caracteres" },
-                })}
-                error={!!errors.name}
-                helperText={errors.name?.message}
+                }}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Nombre completo"
+                    type="name"
+                    variant="filled"
+                    fullWidth
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
+                )}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Correo"
-                type="email"
-                variant="filled"
-                fullWidth
-                {...register("email", {
+              <Controller
+                name="email"
+                rules={{
                   required: "Este campo es requerido",
                   validate: validations.isEmail,
-                })}
-                error={!!errors.email}
-                helperText={errors.email?.message}
+                }}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Correo"
+                    type="email"
+                    variant="filled"
+                    fullWidth
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Contraseña"
-                type="password"
-                variant="filled"
-                fullWidth
-                {...register("password", {
+              <Controller
+                name="password"
+                rules={{
                   required: "Este campo es requerido",
                   minLength: { value: 6, message: "Mínimo 6 caracteres" },
-                })}
-                error={!!errors.password}
-                helperText={errors.password?.message}
+                }}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Contraseña"
+                    type="password"
+                    variant="filled"
+                    fullWidth
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                )}
               />
             </Grid>
 
