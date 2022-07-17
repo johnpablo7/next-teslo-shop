@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { Controller, useForm } from "react-hook-form";
 
@@ -57,16 +57,37 @@ interface Props {
 }
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
+  const [newTagValue, setNewTagValue] = useState("");
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-    // getValues,
-    // setValue,
+    watch,
+    getValues,
+    setValue,
   } = useForm<FormData>({
     defaultValues: product,
   });
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      // console.log({ value, name, type });
+      if (name === "title") {
+        const newSlug =
+          value.title
+            ?.trim()
+            .replace(" ", "_")
+            .replaceAll("'", "")
+            .toLocaleLowerCase() || "";
+
+        setValue("slug", newSlug);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch, setValue]);
 
   // const onChangeSize = (size: string) => {
   //   const currentSizes = getValues("sizes");
@@ -80,7 +101,22 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
   //   setValue("sizes", [...currentSizes, size], { shouldValidate: true });
   // };
 
-  const onDeleteTag = (tag: string) => {};
+  const onNewTag = () => {
+    const newTag = newTagValue.trim().toLocaleLowerCase();
+    setNewTagValue("");
+    const currentTags = getValues("tags");
+
+    if (currentTags.includes(newTag)) {
+      return;
+    }
+
+    currentTags.push(newTag);
+  };
+
+  const onDeleteTag = (tag: string) => {
+    const updatedTags = getValues("tags").filter((t) => t !== tag);
+    setValue("tags", updatedTags, { shouldValidate: true });
+  };
 
   const onSubmit = (form: FormData) => {
     console.log({ form });
@@ -294,6 +330,11 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
               fullWidth
               sx={{ mb: 1 }}
               helperText="Presiona [spacebar] para agregar"
+              value={newTagValue}
+              onChange={({ target }) => setNewTagValue(target.value)}
+              onKeyUp={({ code }) =>
+                code === "Space" ? onNewTag() : undefined
+              }
             />
 
             <Box
@@ -306,7 +347,7 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
               }}
               component="ul"
             >
-              {product.tags.map((tag) => {
+              {getValues("tags").map((tag) => {
                 return (
                   <Chip
                     key={tag}
