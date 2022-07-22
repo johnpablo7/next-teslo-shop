@@ -29,7 +29,7 @@ const CartPage = () => {
 
   return (
     <ShopLayout
-      title="Carrito - 3"
+      title="Dirección"
       pageDescription="Carrito de compras de la tienda"
     >
       <Typography variant="h1" component="h1">
